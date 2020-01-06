@@ -39,7 +39,7 @@ func BenchmarkObjectBuilder_AddMany(b *testing.B) {
 	b.ResetTimer()
 	var l int64
 	for i := 0; i < b.N; i++ {
-		if _, err := builder.AddMany(alphabetMap, true, false); err != nil {
+		if _, err := builder.AddPairs(alphabetMap, true, false); err != nil {
 			b.Fatal(err)
 		}
 		if _, err := builder.CloseObject(); err != nil {
@@ -56,7 +56,7 @@ func TestObjectBuilder_AddMany(t *testing.T) {
 	t.Run("pairs=alphabetMap,omitEmpty=false,rawValues=false", func(t *testing.T) {
 		defer builder.Reset()
 		bytesWritten := 0
-		if m, err := builder.AddMany(alphabetMap, false, false); err != nil {
+		if m, err := builder.AddPairs(alphabetMap, false, false); err != nil {
 			t.Fatal(err)
 		} else {
 			bytesWritten += m

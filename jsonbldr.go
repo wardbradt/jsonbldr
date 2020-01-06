@@ -58,7 +58,7 @@ func (b *ObjectBuilder) AddArray(key string, l []string, omitEmpty bool, rawValu
 	return n + m, err
 }
 
-func (b *ObjectBuilder) AddMany(pairs map[string]string, omitEmpty bool, rawValues bool) (int, error) {
+func (b *ObjectBuilder) AddPairs(pairs map[string]string, omitEmpty bool, rawValues bool) (int, error) {
 	n := 0
 	if m, err := b.writePrefix(); err != nil {
 		return m, err
@@ -66,7 +66,7 @@ func (b *ObjectBuilder) AddMany(pairs map[string]string, omitEmpty bool, rawValu
 		n += m
 	}
 
-	m, err := b.concatenateKeyValuePairsFast(pairs, omitEmpty, rawValues)
+	m, err := b.concatenateKeyValuePairs(pairs, omitEmpty, rawValues)
 	return n + m, err
 }
 
@@ -116,7 +116,7 @@ func (b *ObjectBuilder) prefixForNewItems() string {
 	}
 }
 
-func (b *ObjectBuilder) concatenateKeyValuePairsFast(pairs map[string]string, omitEmpty bool, rawValues bool) (int, error) {
+func (b *ObjectBuilder) concatenateKeyValuePairs(pairs map[string]string, omitEmpty bool, rawValues bool) (int, error) {
 	bytesWritten := 0
 	for k, v := range pairs {
 		if v == "" {
