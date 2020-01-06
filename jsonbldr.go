@@ -71,13 +71,21 @@ func (b *ObjectBuilder) AddMany(pairs map[string]string, omitEmpty bool, rawValu
 }
 
 func (b *ObjectBuilder) AddRawItem(key string, value string) (int, error) {
-	stringToWrite := b.prefixForNewItems() + QuoteWrap(key) + ":" + value
-	return b.Buffer.WriteString(stringToWrite)
+	return b.writeStrings(b.prefixForNewItems(), QuoteWrap(key), ":", value)
+}
+
+func (b *ObjectBuilder) writeStrings(items ...string) (int, error) {
+	bytesWritten := 0
+	for _, item := range items {
+		// Ignore returned error because it is always nil
+		m, _ := b.WriteString(item)
+		bytesWritten += m
+	}
+	return bytesWritten, nil
 }
 
 func (b *ObjectBuilder) AddStringPair(key string, value string) (int, error) {
-	stringToWrite := b.prefixForNewItems() + QuoteWrap(key) + ":" + QuoteWrap(value)
-	return b.Buffer.WriteString(stringToWrite)
+	return b.writeStrings(b.prefixForNewItems(), QuoteWrap(key), ":", QuoteWrap(value))
 }
 
 func (b *ObjectBuilder) CloseObject() (int, error) {
@@ -95,24 +103,17 @@ func (b *ObjectBuilder) Reset() {
 }
 
 func (b *ObjectBuilder) writePrefix() (int, error) {
-	if !b.addedItem {
-		b.addedItem = true
-		return b.WriteString("{")
-	} else {
-		return b.WriteString(",")
-	}
+	return b.WriteString(b.prefixForNewItems())
 }
 
 func (b *ObjectBuilder) prefixForNewItems() string {
-	stringToWrite := ""
 	// Write opening bracket if this is the first time an Add method was called for the current bottom level object
 	if !b.addedItem {
-		stringToWrite += "{"
 		b.addedItem = true
+		return "{"
 	} else {
-		stringToWrite += ","
+		return ","
 	}
-	return stringToWrite
 }
 
 func (b *ObjectBuilder) concatenateKeyValuePairsFast(pairs map[string]string, omitEmpty bool, rawValues bool) (int, error) {

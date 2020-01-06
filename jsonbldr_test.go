@@ -15,7 +15,25 @@ func init() {
 	}
 }
 
-func BenchmarkObjectBuilder_AddManyFast(b *testing.B) {
+func BenchmarkObjectBuilder_AddStringPair(b *testing.B) {
+	builder := New()
+	b.ReportAllocs()
+	b.ResetTimer()
+	var l int64
+	for i := 0; i < b.N; i++ {
+		if _, err := builder.AddStringPair("a", "b"); err != nil {
+			b.Fatal(err)
+		}
+		if _, err := builder.AddStringPair("c", "d"); err != nil {
+			b.Fatal(err)
+		}
+		l = int64(len(builder.Bytes()))
+		builder.Reset()
+	}
+	b.SetBytes(l)
+}
+
+func BenchmarkObjectBuilder_AddMany(b *testing.B) {
 	builder := New()
 	b.ReportAllocs()
 	b.ResetTimer()
