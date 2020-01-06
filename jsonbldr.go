@@ -58,7 +58,7 @@ func (b *ObjectBuilder) AddArray(key string, l []string, omitEmpty bool, rawValu
 	return n + m, err
 }
 
-func (b *ObjectBuilder) AddManyFast(pairs map[string]string, omitEmpty bool, rawValues bool) (int, error) {
+func (b *ObjectBuilder) AddMany(pairs map[string]string, omitEmpty bool, rawValues bool) (int, error) {
 	n := 0
 	if m, err := b.writePrefix(); err != nil {
 		return m, err
@@ -68,11 +68,6 @@ func (b *ObjectBuilder) AddManyFast(pairs map[string]string, omitEmpty bool, raw
 
 	m, err := b.concatenateKeyValuePairsFast(pairs, omitEmpty, rawValues)
 	return n + m, err
-}
-
-func (b *ObjectBuilder) AddMany(pairs map[string]string, omitEmpty bool, rawValues bool) (int, error) {
-	stringToWrite := b.prefixForNewItems() + concatenateKeyValuePairs(pairs, omitEmpty, rawValues)
-	return b.Buffer.WriteString(stringToWrite)
 }
 
 func (b *ObjectBuilder) AddRawItem(key string, value string) (int, error) {
@@ -153,30 +148,6 @@ func (b *ObjectBuilder) concatenateKeyValuePairsFast(pairs map[string]string, om
 		}
 	}
 	return bytesWritten, nil
-}
-
-func concatenateKeyValuePairs(pairs map[string]string, omitEmpty bool, rawValues bool) string {
-	result := ""
-	for k, v := range pairs {
-		if v == "" {
-			if !omitEmpty {
-				v = `""`
-			} else {
-				continue
-			}
-		}
-
-		if result != "" {
-			result += ","
-		}
-		result += QuoteWrap(k) + ":"
-		if rawValues {
-			result += v
-		} else {
-			result += QuoteWrap(v)
-		}
-	}
-	return result
 }
 
 type ToJsonner interface {
