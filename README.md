@@ -24,3 +24,14 @@ Output:
 ```
 {"a":"apple","b":"banana","c":"car","d":"dog"}
 ```
+
+## Reset an ObjectBuilder for reuse
+
+```go 
+builder := jsonbldr.New()
+builder.AddStringPair("lemon", "yellow")
+builder.CloseObject()
+log.Println(string(builder.Bytes())) // Output: {"lemon":"yellow"}
+builder.Reset()
+log.Println(len(builder.Bytes())) // Outputs 0
+```
