@@ -29,35 +29,36 @@ func (b *ObjectBuilder) AddOpenNestedObject(key string) (int, error) {
 	return b.Buffer.WriteString(stringToWrite)
 }
 
-func (b *ObjectBuilder) AddArray(key string, l []string, omitEmpty bool, rawValues bool) (int, error) {
-	n := 0
-	var err error
-	if n, err = b.WriteString(b.prefixForNewItems() + QuoteWrap(key) + ":["); err != nil {
-		return n, err
-	}
-	values := ""
-	for i, s := range l {
-		if s == "" {
+// Setting the second parameter, omitempty, to true causes empty values to be ignored.
+// Setting the third parameter, rawValues, to false causes each value to be wrapped in double quotes
+// to make it a valid string.
+func (b *ObjectBuilder) AddArray(key string, items []string, omitEmpty bool, rawValues bool) (int, error) {
+	bytesWritten, _ := b.writeStrings(b.prefixForNewItems(), QuoteWrap(key), ":[")
+	for i, item := range items {
+		if item == "" {
 			if !omitEmpty {
-				s = `""`
+				item = `""`
 			} else {
 				continue
 			}
+		} else if !rawValues {
+			item = QuoteWrap(item)
 		}
 		if i != 0 {
-			values += ","
+			m, _ := b.WriteString(",")
+			bytesWritten += m
 		}
-		if rawValues {
-			values += s
-		} else {
-			values += QuoteWrap(s)
-		}
+		m, _ := b.WriteString(item)
+		bytesWritten += m
 	}
 
-	m, err := b.WriteString("]")
-	return n + m, err
+	m, _ := b.WriteString("]")
+	return bytesWritten + m, nil
 }
 
+// Setting the second parameter, omitempty, to true causes empty values to be ignored.
+// Setting the third parameter, rawValues, to false causes each value to be wrapped in double quotes
+// to make it a valid string.
 func (b *ObjectBuilder) AddPairs(pairs map[string]string, omitEmpty bool, rawValues bool) (int, error) {
 	n := 0
 	if m, err := b.writePrefix(); err != nil {

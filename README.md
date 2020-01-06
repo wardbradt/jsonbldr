@@ -3,7 +3,7 @@
  
  ## Examples
  
- ## String Map
+ ### String Map
  
  ```go
 sampleMap := map[string]string{
@@ -21,11 +21,26 @@ builder.CloseObject()
 log.Println(string(builder.Bytes()))
 ```
 Output:
-```
+```json
 {"a":"apple","b":"banana","c":"car","d":"dog"}
 ```
 
-## Reset an ObjectBuilder for reuse
+### Array as a Value 
+```go
+sampleSlice := []string{"apple", "banana", "clementine", "durian"}
+// Setting the second parameter, omitempty, to true causes empty values to be ignored.
+// Setting the third parameter, rawValues, to false causes each value to be wrapped in double quotes
+//   to make it a valid string.
+builder.AddArray("fruits", sampleSlice, true, false)
+builder.CloseObject()
+log.Println(string(builder.Bytes()))
+```
+Output:
+```json
+ {"fruits":["apple","banana","clementine","durian"]}
+```
+
+### Reset an ObjectBuilder for reuse
 
 ```go 
 builder := jsonbldr.New()
