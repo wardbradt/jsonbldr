@@ -29,7 +29,7 @@ func (b *ObjectBuilder) AddOpenNestedObject(key string) (int, error) {
 	return b.Buffer.WriteString(stringToWrite)
 }
 
-func (b *ObjectBuilder) AddArray(key string, l []string, includeEmpty bool, rawValues bool) (int, error) {
+func (b *ObjectBuilder) AddArray(key string, l []string, omitEmpty bool, rawValues bool) (int, error) {
 	n := 0
 	var err error
 	if n, err = b.WriteString(b.prefixForNewItems() + QuoteWrap(key) + ":["); err != nil {
@@ -38,7 +38,7 @@ func (b *ObjectBuilder) AddArray(key string, l []string, includeEmpty bool, rawV
 	values := ""
 	for i, s := range l {
 		if s == "" {
-			if includeEmpty {
+			if !omitEmpty {
 				s = `""`
 			} else {
 				continue
@@ -58,7 +58,7 @@ func (b *ObjectBuilder) AddArray(key string, l []string, includeEmpty bool, rawV
 	return n + m, err
 }
 
-func (b *ObjectBuilder) AddManyFast(pairs map[string]string, includeEmpty bool, rawValues bool) (int, error) {
+func (b *ObjectBuilder) AddManyFast(pairs map[string]string, omitEmpty bool, rawValues bool) (int, error) {
 	n := 0
 	if m, err := b.writePrefix(); err != nil {
 		return m, err
@@ -66,12 +66,12 @@ func (b *ObjectBuilder) AddManyFast(pairs map[string]string, includeEmpty bool, 
 		n += m
 	}
 
-	m, err := b.concatenateKeyValuePairsFast(pairs, includeEmpty, rawValues)
+	m, err := b.concatenateKeyValuePairsFast(pairs, omitEmpty, rawValues)
 	return n + m, err
 }
 
-func (b *ObjectBuilder) AddMany(pairs map[string]string, includeEmpty bool, rawValues bool) (int, error) {
-	stringToWrite := b.prefixForNewItems() + concatenateKeyValuePairs(pairs, includeEmpty, rawValues)
+func (b *ObjectBuilder) AddMany(pairs map[string]string, omitEmpty bool, rawValues bool) (int, error) {
+	stringToWrite := b.prefixForNewItems() + concatenateKeyValuePairs(pairs, omitEmpty, rawValues)
 	return b.Buffer.WriteString(stringToWrite)
 }
 
@@ -120,11 +120,11 @@ func (b *ObjectBuilder) prefixForNewItems() string {
 	return stringToWrite
 }
 
-func (b *ObjectBuilder) concatenateKeyValuePairsFast(pairs map[string]string, includeEmpty bool, rawValues bool) (int, error) {
+func (b *ObjectBuilder) concatenateKeyValuePairsFast(pairs map[string]string, omitEmpty bool, rawValues bool) (int, error) {
 	bytesWritten := 0
 	for k, v := range pairs {
 		if v == "" {
-			if includeEmpty {
+			if !omitEmpty {
 				v = `""`
 			} else {
 				continue
@@ -155,11 +155,11 @@ func (b *ObjectBuilder) concatenateKeyValuePairsFast(pairs map[string]string, in
 	return bytesWritten, nil
 }
 
-func concatenateKeyValuePairs(pairs map[string]string, includeEmpty bool, rawValues bool) string {
+func concatenateKeyValuePairs(pairs map[string]string, omitEmpty bool, rawValues bool) string {
 	result := ""
 	for k, v := range pairs {
 		if v == "" {
-			if includeEmpty {
+			if !omitEmpty {
 				v = `""`
 			} else {
 				continue

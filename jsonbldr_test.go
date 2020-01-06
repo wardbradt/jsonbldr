@@ -16,8 +16,8 @@ func init() {
 
 func BenchmarkObjectBuilder_AddManyFast(b *testing.B) {
 	builder := New()
-	//b.ResetTimer()
 	b.ReportAllocs()
+	b.ResetTimer()
 	var l int64
 	for i := 0; i < b.N; i++ {
 		if _, err := builder.AddManyFast(mapData, true, false); err != nil {
@@ -34,8 +34,8 @@ func BenchmarkObjectBuilder_AddManyFast(b *testing.B) {
 
 func BenchmarkObjectBuilder_AddMany(b *testing.B) {
 	builder := New()
-	b.ResetTimer()
 	b.ReportAllocs()
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		if _, err := builder.AddMany(mapData, true, false); err != nil {
 			b.Fatal(err)
